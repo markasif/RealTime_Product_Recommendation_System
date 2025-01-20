@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Product Recommendation</title>
+    <script>
+        function submitForm(event) {
+            event.preventDefault();  // Prevent the form from submitting the traditional way
+
+            // Create the data object from the form
+            const formData = {
+                timestamp_x: document.getElementById('timestamp_x').value,
+                visitorid: document.getElementById('visitorid').value,
+                event: document.getElementById('event').value,
+                timestamp_y: document.getElementById('timestamp_y').value,
+                property: document.getElementById('property').value
+            };
+
+            // Send the data via a POST request to the Flask backend
+            fetch('/recommend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response here (display recommended items)
+                const recommendedItems = data.recommended_items;
+                let html = '<ul>';
+                recommendedItems.forEach(item => {
+                    html += `<li>Item ID: ${item}</li>`;
+                });
+                html += '</ul>';
+                document.getElementById('recommendationResults').innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Real-Time Product Recommendation</h1>
+    <form onsubmit="submitForm(event)">
+        <label for="timestamp_x">Timestamp (x):</label><br>
+        <input type="text" id="timestamp_x" name="timestamp_x"><br><br>
+    
+        <label for="visitorid">Visitor ID:</label><br>
+        <input type="text" id="visitorid" name="visitorid"><br><br>
+    
+        <label for="event">Event:</label><br>
+        <input type="text" id="event" name="event"><br><br>
+    
+        <label for="timestamp_y">Timestamp (y):</label><br>
+        <input type="text" id="timestamp_y" name="timestamp_y"><br><br>
+    
+        <label for="property">Property:</label><br>
+        <input type="text" id="property" name="property"><br><br>
+    
+        <input type="submit" value="Get Recommendations">
+    </form>
+    
+
+    <div id="recommendationResults"></div>
+</body>
+</html>
